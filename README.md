@@ -54,6 +54,10 @@ The project includes integration tests that verify the API functionality:
 
 ```bash
 # Run all tests
+cd tests
+
+npm install
+
 npm test
 
 # Run tests in watch mode (for development)
