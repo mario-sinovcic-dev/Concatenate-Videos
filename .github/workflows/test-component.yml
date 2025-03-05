@@ -36,12 +36,12 @@ jobs:
         run: |
           make test
 
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: |
-            output/
-            tests/coverage/
-          retention-days: 7 
+      # - name: Upload test artifacts TODO -add this back in
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ inputs.artifact_name }}
+      #     path: |
+      #       output/
+      #       tests/coverage/
+      #     retention-days: 7 
