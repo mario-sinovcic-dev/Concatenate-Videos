@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node_version: ['16.x', '18.x', '20.x']
-    uses: ./.github/workflow-components/test.yml
+    uses: ./.github/workflow-components/test.yml@v1
     with:
       node_version: ${{ matrix.node_version }}
       test_name: 'Main Branch Test - Node ${{ matrix.node_version }}'
