@@ -46,6 +46,10 @@ setup: install start-api-d start-localstack
 lint: install
 	npm run lint
 
+.PHONY: lint-fix
+lint-fix: install
+	npm run lint:fix
+
 .PHONY: audit
 audit: install
 	npm audit

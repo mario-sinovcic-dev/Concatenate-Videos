@@ -1,4 +1,4 @@
-import { Job, Status } from "../domain/model/job";
+import { Job, Status } from '../domain/model/job';
 
 const jobs: Job[] = [];
 

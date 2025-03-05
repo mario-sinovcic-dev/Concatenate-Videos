@@ -16,3 +16,22 @@ Development:
 
 Convenience:
   setup           - One-command setup: install deps, start infrastructure and API 
+
+Usage: make [target]
+
+Targets:
+  help           Show this help message
+  install        Install dependencies
+  test           Run tests
+  clean          Remove build artifacts and dependencies
+  start-api      Start the API service
+  start-api-d    Start the API service in detached mode
+  stop-api       Stop the API service
+  start-localstack Start LocalStack for local AWS services
+  stop-localstack  Stop LocalStack
+  setup          Install dependencies and start services
+  lint           Run linting checks
+  lint-fix       Automatically fix linting issues where possible
+  audit          Run npm security audit
+  create-job     Create a new video concatenation job
+  get-status     Get the status of a job (requires JOB_ID) 

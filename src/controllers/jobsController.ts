@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-import { CreateJobRequest } from "../domain/model/job";
-import * as jobService from "../domain/jobService";
+import { CreateJobRequest } from '../domain/model/job';
+import * as jobService from '../domain/jobService';
 
 export async function createJob(req: Request, res: Response) {
   const createJobRequest: CreateJobRequest = req.body;
