@@ -53,11 +53,3 @@ lint-fix: install
 .PHONY: audit
 audit: install
 	npm audit
-
-.PHONY: create-job get-status
-create-job:
-	@echo "Creating a new video concatenation job"
-
-get-status:
-	@echo "Getting job status"
-	@echo "Usage: make get-status JOB_ID=<job_id>" 

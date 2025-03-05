@@ -33,5 +33,3 @@ Targets:
   lint           Run linting checks
   lint-fix       Automatically fix linting issues where possible
   audit          Run npm security audit
-  create-job     Create a new video concatenation job
-  get-status     Get the status of a job (requires JOB_ID) 

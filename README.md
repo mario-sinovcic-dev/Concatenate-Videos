@@ -20,20 +20,23 @@ A service for concatenating video files using Node.js and AWS services.
 
 ### Using Make (Recommended)
 ```bash
+# Info on all make targets
+make help
+
 # Run tests
 make test
 
-# Install, build and start everything
+# Install, build and start API and localstack
 make setup
 
-# Start the API service
+# Just start the API service
 make start-api
-
-# Start in detached mode
-make start-api-d
 
 # Stop the API service
 make stop-api
+
+# Stop the localstack service
+make stop-localstack 
 ```
 
 The API will run on port 8000.
@@ -103,5 +106,33 @@ returns
 }
 ```
 
-## Architecture
-![Overview](./architecture-overview.png)
+## In Progress
+### Prosed Architecture vs Existing Architecture
+
+- currently the system design looks like first diagram [see original diagram for more info.](./architecture-overview.png)
+- looking to move away from this and transition to the architecture below, need to implement repository and calls to infra from API (S3, SQS, Postgres, etc.)
+
+__Current Architecture__
+```
+API -> Controllers -> Domain -> Repository -> In-Memory
+                        |           |
+                        v           v
+                     ffmpeg    local file system
+                        ^
+                        |
+              Background Job Processor
+```
+
+__Proposed New Architecture__
+```
+API -> Controllers -> Domain -> Repository -> PostgreSQL (RDS)
+                        |           |
+                        v           v
+                     ffmpeg    S3 Bucket
+                        ^
+                        |
+                    SQS Queue
+                        ^
+                        |
+              Background Job Processor
+```
