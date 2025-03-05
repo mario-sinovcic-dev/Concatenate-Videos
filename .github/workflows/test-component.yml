@@ -29,8 +29,10 @@ jobs:
 
       - name: Build and run tests
         run: |
+          # Convert version format (e.g., '18.x' to '18')
+          NODE_VERSION=$(echo ${{ inputs.node_version }} | cut -d'.' -f1)
           docker build \
-            --build-arg NODE_VERSION=${{ inputs.node_version }} \
+            --build-arg NODE_VERSION=$NODE_VERSION \
             -t concatenate-videos-test-${{ inputs.node_version }} \
             -f Dockerfile.test .
           docker run --rm \
