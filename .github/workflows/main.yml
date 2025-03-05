@@ -5,7 +5,14 @@ on:
     branches: [ main, master ]
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint-component.yml
+    with:
+      node_version: '18.x'
+      lint_name: 'Main Branch Lint Check'
+
   test:
+    needs: lint
     strategy:
       matrix:
         node_version: ['16.x', '18.x', '20.x']
@@ -15,50 +22,22 @@ jobs:
       test_name: 'Main Branch Test - Node ${{ matrix.node_version }}'
       artifact_name: 'test-output-main-${{ matrix.node_version }}'
 
-  lint:
-    name: Quality Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          cache: 'npm'
-
-      - name: Run tests
-        run: make test
-
-      - name: Run lint
-        run: make lint
-    
-    #quality:
-      # TODO: Add code quality scanning
+  # quality:
+      # TODO: Add SonarCloud scanning
       # - name: SonarCloud Analysis
       #   uses: SonarSource/sonarcloud-github-action@master
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   with:
-      #     args: >
-      #       -Dsonar.projectKey=concatenate-videos
-      #       -Dsonar.organization=your-org
 
-      # TODO: Add security scanning
-      # - name: Wiz Security Scan
+      # TODO: Add Wiz security scanning
+      # - name: Wiz Scan
       #   uses: wiz-sec/wiz-cli@v1
       #   with:
       #     auth-token: ${{ secrets.WIZ_TOKEN }}
-      #     policy: production  # Stricter policy for main branch
 
-      # TODO: Add dependency scanning
-      # - name: Dependency Review
-      #   uses: actions/dependency-review-action@v3 
-  
-    # deploy:
-      # TODO: Add actual deployment steps - gated based on enviroment: dev, staging, production
-      # Example:
-      # - name: Deploy to production
-      #   run: echo "Deploy to production"
-      #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+  # deploy:
+    # TODO: Add actual deployment steps - gated based on enviroment: dev, staging, production
+    # Example:
+    # - name: Deploy to production
+    #   run: echo "Deploy to production"
+    #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'

@@ -6,20 +6,10 @@ on:
 
 jobs:
   lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          cache: 'npm'
-
-      - name: Run lint
-        run: make lint
+    uses: ./.github/workflows/lint-component.yml
+    with:
+      node_version: '18.x'
+      lint_name: 'PR Lint Check'
 
   # quality:
       # TODO: Add SonarCloud scanning
