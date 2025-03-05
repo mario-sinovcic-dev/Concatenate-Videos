@@ -20,6 +20,9 @@ A service for concatenating video files using Node.js and AWS services.
 
 ### Using Make (Recommended)
 ```bash
+# Run tests
+make test
+
 # Install, build and start everything
 make setup
 
