@@ -1,9 +1,23 @@
-# Concatenate Videos
+# Video Concatenation Service
 
-### Running the application
+A service for concatenating video files using Node.js and AWS services.
 
-#### Using Docker (Recommended)
+## Prerequisites
+### Development Tools
+- Node.js (>= 18)
+- npm (>= 9)
+- Docker (>= 20.10.0)
+- Docker Compose V2
 
+### For Local Testing
+- Terraform (>= 1.0.0)
+- AWS CLI
+- curl
+- PostgreSQL client (psql)
+
+## Running the Application
+
+### Using Docker (Recommended)
 ```bash
 # Build and start the application
 docker compose up --build
@@ -17,8 +31,7 @@ docker compose down
 
 The API will run on port 8000.
 
-#### Local OS Setup (Alternative)
-
+### Local OS Setup (Alternative)
 1. Install OS-level dependencies:
 ```bash
 # macOS
@@ -46,34 +59,18 @@ npm install
 npm start
 ```
 
-The API will run on port 8000.
+## Project Structure
+- `/src` - Application source code
+- `/tests` - Test files and configurations
+- `/terraform` - Infrastructure as Code
+- `/scripts` - Utility scripts
 
-### Running Tests
+## Documentation
+- [Infrastructure Setup](./terraform/README.md)
+- [API Documentation](./docs/api.md)
+- [Testing Guide](./docs/testing.md)
 
-The project includes integration tests that verify the API functionality:
-
-```bash
-# Run all tests
-cd tests
-
-npm install
-
-npm test
-
-# Run tests in watch mode (for development)
-npm test -- --watch
-
-# Run tests with coverage report [TODO - currently, not configured correctly]
-npm test -- --coverage
-```
-
-The tests will:
-1. Start the application in Docker
-2. Run the test suite
-3. Clean up Docker resources
-
-### API Call Flow
-
+## API Call Flow
 ```
 POST /jobs
 {
@@ -85,7 +82,6 @@ POST /jobs
 ```
 
 returns
-
 ```
 {
     "id": "<job id>"
@@ -98,13 +94,11 @@ GET /job/{jobId}/status
 ```
 
 returns
-
 ```
 {
     "status": "pending"
 }
 ```
 
-### Architecture
-
+## Architecture
 ![Overview](./architecture-overview.png)
