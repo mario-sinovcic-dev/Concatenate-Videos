@@ -45,7 +45,7 @@ async function runDockerCompose(command: string): Promise<void> {
  *    - Test cleanup of temporary files
  */
 
-jest.setTimeout(120000); // Set timeout for all tests
+jest.setTimeout(60000); // Reduced timeout
 
 describe('Video Concatenation API', () => {
     // Arrange
@@ -55,12 +55,12 @@ describe('Video Concatenation API', () => {
         
         // Wait for API to be ready with health check
         let isApiReady = false;
-        const maxRetries = 30;
-        const retryInterval = 2000;
+        const maxRetries = 15;
+        const retryInterval = 1000;
         
         for (let i = 0; i < maxRetries && !isApiReady; i++) {
             try {
-                await axios.get('http://localhost:8000/health');
+                await axios.get(`${API_URL}/health`);
                 isApiReady = true;
                 console.log('API is ready');
             } catch (error) {
@@ -72,16 +72,15 @@ describe('Video Concatenation API', () => {
         if (!isApiReady) {
             throw new Error('API failed to become ready');
         }
-    }, 120000); // 2 minute timeout for setup
+    }, 60000);
 
-    // Cleanup after all tests
     afterAll(async () => {
         try {
             await runDockerCompose('down');
         } catch (error) {
             console.error('Error during cleanup:', error);
         }
-    }, 30000); // 30 second timeout for cleanup
+    }); // No timeout for cleanup
 
     it('should create a job successfully', async () => {
         // Arrange
@@ -93,7 +92,7 @@ describe('Video Concatenation API', () => {
         };
 
         // Act
-        const response = await axios.post('http://localhost:8000/jobs', requestBody);
+        const response = await axios.post(`${API_URL}/jobs`, requestBody);
 
         // Assert
         expect(response.status).toBe(201);
@@ -101,5 +100,5 @@ describe('Video Concatenation API', () => {
         expect(response.data).toHaveProperty('status');
         expect(typeof response.data.id).toBe('string');
         expect(response.data.id.length).toBeGreaterThan(0);
-    }, 30000); // 30 second timeout for the test
+    }, 10000);
 }); 
