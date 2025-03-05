@@ -14,8 +14,7 @@ jobs:
       node_version: ${{ matrix.node_version }}
       test_name: 'Main Branch Test - Node ${{ matrix.node_version }}'
       artifact_name: 'test-output-main-${{ matrix.node_version }}'
-    secrets:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      snyk_token: ${{ secrets.SNYK_TOKEN }}
 
   deploy:
     needs: test

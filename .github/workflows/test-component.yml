@@ -14,9 +14,10 @@ on:
       artifact_name:
         required: true
         type: string
-    secrets:
-      SNYK_TOKEN:
+      snyk_token:
         required: false
+        type: string
+        default: ''
 
 jobs:
   test:
@@ -42,10 +43,10 @@ jobs:
             concatenate-videos-test-${{ inputs.node_version }} npm test
 
       - name: Run security scan
-        if: ${{ inputs.node_version == '18.x' && secrets.SNYK_TOKEN != '' }}
+        if: ${{ inputs.node_version == '18.x' && inputs.snyk_token != '' }}
         uses: snyk/actions/node@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ inputs.snyk_token }}
         with:
           args: --severity-threshold=high
 
