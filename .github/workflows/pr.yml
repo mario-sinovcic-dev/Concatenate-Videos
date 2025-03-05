@@ -1,0 +1,50 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run linting
+        run: |
+          docker build -t concatenate-videos-lint -f Dockerfile.test .
+          docker run --rm concatenate-videos-lint npm run lint || true
+
+  test:
+    needs: lint
+    strategy:
+      matrix:
+        node_version: ['16.x', '18.x', '20.x']
+    uses: ./.github/workflows/components/test.yml
+    with:
+      node_version: ${{ matrix.node_version }}
+      test_name: 'PR Test - Node ${{ matrix.node_version }}'
+      artifact_name: 'test-output-pr-${{ matrix.node_version }}'
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  security:
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run security audit
+        run: |
+          docker build -t concatenate-videos-security -f Dockerfile.test .
+          docker run --rm concatenate-videos-security npm audit 

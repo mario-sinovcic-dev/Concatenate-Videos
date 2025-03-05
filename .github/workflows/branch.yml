@@ -1,0 +1,15 @@
+name: Branch Tests
+
+on:
+  push:
+    branches-ignore: [ main, master, develop ]
+
+jobs:
+  test:
+    uses: ./.github/workflows/components/test.yml
+    with:
+      node_version: '18.x'
+      test_name: 'Quick Test'
+      artifact_name: 'test-output-branch'
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} 
