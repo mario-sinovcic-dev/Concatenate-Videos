@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflow-components/test.yml@v1
+    uses: ./.github/workflows/test-component.yml@v1
     with:
       node_version: '18.x'
       test_name: 'Quick Test'
