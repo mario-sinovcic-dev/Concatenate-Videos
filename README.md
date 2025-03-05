@@ -2,19 +2,51 @@
 
 ### Running the application
 
-OS-level Dependencies:
+#### Using Docker (Recommended)
 
+```bash
+# Build and start the application
+docker compose up --build
+
+# To run in detached mode
+docker compose up -d --build
+
+# To stop the application
+docker compose down
 ```
+
+The API will run on port 8000.
+
+#### Local OS Setup (Alternative)
+
+1. Install OS-level dependencies:
+```bash
+# macOS
 brew install ffmpeg
+
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install -y ffmpeg
+
+# CentOS/RHEL
+sudo yum install -y ffmpeg
 ```
 
-Start the api and background job processor
-
+2. Create output directory:
+```bash
+mkdir -p output
 ```
+
+3. Install Node.js dependencies:
+```bash
+npm install
+```
+
+4. Start the application:
+```bash
 npm start
 ```
 
-api runs on port 8000
+The API will run on port 8000.
 
 ### API Call Flow
 
