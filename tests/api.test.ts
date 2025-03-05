@@ -8,11 +8,44 @@ const API_URL = 'http://localhost:8000';
 // Helper function to manage Docker Compose
 async function runDockerCompose(command: string): Promise<void> {
     try {
-        await execAsync(`docker compose ${command}`);
+        // Add --no-recreate for faster startup when container exists
+        if (command === 'up -d --build') {
+            await execAsync('docker compose up -d --no-recreate || docker compose up -d --build');
+        } else {
+            await execAsync(`docker compose ${command}`);
+        }
     } catch (error) {
         console.error(`Docker Compose error:`, error);
         throw error;
     }
+}
+
+// Optimized health check with faster initial checks
+async function waitForApi(maxRetries = 15): Promise<void> {
+    // Start with quick checks
+    for (let i = 0; i < 5; i++) {
+        try {
+            await axios.get(`${API_URL}/health`);
+            console.log('API is ready');
+            return;
+        } catch (error) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+    }
+    
+    // If quick checks fail, fall back to slower checks
+    for (let i = 5; i < maxRetries; i++) {
+        try {
+            await axios.get(`${API_URL}/health`);
+            console.log('API is ready');
+            return;
+        } catch (error) {
+            console.log(`API not ready, attempt ${i + 1}/${maxRetries}`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+    
+    throw new Error('API failed to become ready');
 }
 
 /**
@@ -45,46 +78,23 @@ async function runDockerCompose(command: string): Promise<void> {
  *    - Test cleanup of temporary files
  */
 
-jest.setTimeout(120000); // Set timeout for all tests
+jest.setTimeout(60000);
 
 describe('Video Concatenation API', () => {
-    // Arrange
     beforeAll(async () => {
-        // Start Docker Compose before all tests
         await runDockerCompose('up -d --build');
-        
-        // Wait for API to be ready with health check
-        let isApiReady = false;
-        const maxRetries = 30;
-        const retryInterval = 2000;
-        
-        for (let i = 0; i < maxRetries && !isApiReady; i++) {
-            try {
-                await axios.get('http://localhost:8000/health');
-                isApiReady = true;
-                console.log('API is ready');
-            } catch (error) {
-                console.log(`API not ready, attempt ${i + 1}/${maxRetries}`);
-                await new Promise(resolve => setTimeout(resolve, retryInterval));
-            }
-        }
+        await waitForApi();
+    }, 60000);
 
-        if (!isApiReady) {
-            throw new Error('API failed to become ready');
-        }
-    }, 120000); // 2 minute timeout for setup
-
-    // Cleanup after all tests
     afterAll(async () => {
         try {
             await runDockerCompose('down');
         } catch (error) {
             console.error('Error during cleanup:', error);
         }
-    }, 30000); // 30 second timeout for cleanup
+    });
 
     it('should create a job successfully', async () => {
-        // Arrange
         const requestBody = {
             sourceVideoUrls: ["https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"],
             destination: {
@@ -92,14 +102,12 @@ describe('Video Concatenation API', () => {
             }
         };
 
-        // Act
-        const response = await axios.post('http://localhost:8000/jobs', requestBody);
+        const response = await axios.post(`${API_URL}/jobs`, requestBody);
 
-        // Assert
         expect(response.status).toBe(201);
         expect(response.data).toHaveProperty('id');
         expect(response.data).toHaveProperty('status');
         expect(typeof response.data.id).toBe('string');
         expect(response.data.id.length).toBeGreaterThan(0);
-    }, 30000); // 30 second timeout for the test
+    }, 10000);
 }); 
