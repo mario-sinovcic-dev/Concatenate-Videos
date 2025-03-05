@@ -1,8 +1,8 @@
-name: Branch Tests
+name: Feature Branch Workflow
 
 on:
   push:
-    branches-ignore: [ main, master, develop ]
+    branches-ignore: [ main, master, develop ] # TODO - depends on branching strategy
 
 jobs:
   test:

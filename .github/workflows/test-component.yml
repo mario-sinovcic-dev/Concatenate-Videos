@@ -1,4 +1,4 @@
-# TODO- Move deployment automation components into a github-actions/ folder for GHA.
+# TODO- Move deployment automation components into a seperate folder for GHA.
 
 name: Test Component
 
