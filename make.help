@@ -1,0 +1,16 @@
+API Service:
+  start-api        - Start the API service in interactive mode
+  start-api-d      - Start the API service in detached mode
+  stop-api         - Stop the API service
+
+Local Infrastructure:
+  start-localstack - Start local AWS services (SQS, S3) and PostgreSQL
+  stop-localstack  - Stop and remove local infrastructure containers
+
+Development:
+  install          - Install Node.js dependencies
+  test            - Run the test suite (automatically installs dependencies)
+  clean           - Remove build artifacts and output directories
+
+Convenience:
+  setup           - One-command setup: install deps, start infrastructure and API 

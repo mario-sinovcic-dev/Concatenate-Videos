@@ -8,6 +8,7 @@ A service for concatenating video files using Node.js and AWS services.
 - npm (>= 9)
 - Docker (>= 20.10.0)
 - Docker Compose V2
+- Make
 
 ### For Local Testing
 - Terraform (>= 1.0.0)
@@ -17,16 +18,19 @@ A service for concatenating video files using Node.js and AWS services.
 
 ## Running the Application
 
-### Using Docker (Recommended)
+### Using Make (Recommended)
 ```bash
-# Build and start the application
-docker compose up --build
+# Install, build and start everything
+make setup
 
-# To run in detached mode
-docker compose up -d --build
+# Start the API service
+make start-api
 
-# To stop the application
-docker compose down
+# Start in detached mode
+make start-api-d
+
+# Stop the API service
+make stop-api
 ```
 
 The API will run on port 8000.
@@ -44,17 +48,12 @@ sudo apt-get update && sudo apt-get install -y ffmpeg
 sudo yum install -y ffmpeg
 ```
 
-2. Create output directory:
-```bash
-mkdir -p output
-```
-
-3. Install Node.js dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-4. Start the application:
+3. Start the application:
 ```bash
 npm start
 ```
@@ -64,11 +63,12 @@ npm start
 - `/tests` - Test files and configurations
 - `/terraform` - Infrastructure as Code
 - `/scripts` - Utility scripts
+- `Makefile` - Development workflow automation
 
 ## Documentation
 - [Infrastructure Setup](./terraform/README.md)
-- [API Documentation](./docs/api.md)
-- [Testing Guide](./docs/testing.md)
+- [Testing Guide](./test/README.md)
+- API Doco - TODO via swagger or other
 
 ## API Call Flow
 ```
