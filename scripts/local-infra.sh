@@ -3,6 +3,8 @@
 # Ensure script fails on any error
 set -e
 
+# TODO - this bash script should be replaced with something that can run on any OS
+
 # Function to check if LocalStack is ready
 wait_for_localstack() {
     echo "Waiting for LocalStack to be ready..."

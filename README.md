@@ -8,6 +8,7 @@ A service for concatenating video files using Node.js and AWS services.
 - npm (>= 9)
 - Docker (>= 20.10.0)
 - Docker Compose V2
+- Make
 
 ### For Local Testing
 - Terraform (>= 1.0.0)
@@ -17,16 +18,25 @@ A service for concatenating video files using Node.js and AWS services.
 
 ## Running the Application
 
-### Using Docker (Recommended)
+### Using Make (Recommended)
 ```bash
-# Build and start the application
-docker compose up --build
+# Info on all make targets
+make help
 
-# To run in detached mode
-docker compose up -d --build
+# Run tests
+make test
 
-# To stop the application
-docker compose down
+# Install, build and start API and localstack
+make setup
+
+# Just start the API service
+make start-api
+
+# Stop the API service
+make stop-api
+
+# Stop the localstack service
+make stop-localstack 
 ```
 
 The API will run on port 8000.
@@ -44,17 +54,12 @@ sudo apt-get update && sudo apt-get install -y ffmpeg
 sudo yum install -y ffmpeg
 ```
 
-2. Create output directory:
-```bash
-mkdir -p output
-```
-
-3. Install Node.js dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-4. Start the application:
+3. Start the application:
 ```bash
 npm start
 ```
@@ -64,11 +69,12 @@ npm start
 - `/tests` - Test files and configurations
 - `/terraform` - Infrastructure as Code
 - `/scripts` - Utility scripts
+- `Makefile` - Development workflow automation
 
 ## Documentation
 - [Infrastructure Setup](./terraform/README.md)
-- [API Documentation](./docs/api.md)
-- [Testing Guide](./docs/testing.md)
+- [Testing Guide](./test/README.md)
+- API Doco - TODO via swagger or other
 
 ## API Call Flow
 ```
@@ -100,5 +106,33 @@ returns
 }
 ```
 
-## Architecture
-![Overview](./architecture-overview.png)
+## In Progress
+### Prosed Architecture vs Existing Architecture
+
+- currently the system design looks like first diagram [see original diagram for more info.](./architecture-overview.png)
+- looking to move away from this and transition to the architecture below, need to implement repository and calls to infra from API (S3, SQS, Postgres, etc.)
+
+__Current Architecture__
+```
+API -> Controllers -> Domain -> Repository -> In-Memory
+                        |           |
+                        v           v
+                     ffmpeg    local file system
+                        ^
+                        |
+              Background Job Processor
+```
+
+__Proposed New Architecture__
+```
+API -> Controllers -> Domain -> Repository -> PostgreSQL (RDS)
+                        |           |
+                        v           v
+                     ffmpeg    S3 Bucket
+                        ^
+                        |
+                    SQS Queue
+                        ^
+                        |
+              Background Job Processor
+```

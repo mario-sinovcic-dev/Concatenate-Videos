@@ -1,11 +1,18 @@
-name: Main Branch Tests
+name: Main Branch Workflow
 
 on:
   push:
     branches: [ main, master ]
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint-component.yml
+    with:
+      node_version: '18.x'
+      lint_name: 'Main Branch Lint Check'
+
   test:
+    needs: lint
     strategy:
       matrix:
         node_version: ['16.x', '18.x', '20.x']
@@ -15,11 +22,22 @@ jobs:
       test_name: 'Main Branch Test - Node ${{ matrix.node_version }}'
       artifact_name: 'test-output-main-${{ matrix.node_version }}'
 
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to production
-        run: echo "Deploy to production"
-        # TODO: Add actual deployment steps 
+  # quality:
+      # TODO: Add SonarCloud scanning
+      # - name: SonarCloud Analysis
+      #   uses: SonarSource/sonarcloud-github-action@master
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # TODO: Add Wiz security scanning
+      # - name: Wiz Scan
+      #   uses: wiz-sec/wiz-cli@v1
+      #   with:
+      #     auth-token: ${{ secrets.WIZ_TOKEN }}
+
+  # deploy:
+    # TODO: Add actual deployment steps - gated based on enviroment: dev, staging, production
+    # Example:
+    # - name: Deploy to production
+    #   run: echo "Deploy to production"
+    #   if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'

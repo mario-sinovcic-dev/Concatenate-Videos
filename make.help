@@ -1,0 +1,35 @@
+API Service:
+  start-api        - Start the API service in interactive mode
+  start-api-d      - Start the API service in detached mode
+  stop-api         - Stop the API service
+
+Local Infrastructure:
+  start-localstack - Start local AWS services (SQS, S3) and PostgreSQL
+  stop-localstack  - Stop and remove local infrastructure containers
+
+Development:
+  install          - Install Node.js dependencies
+  test            - Run the test suite (automatically installs dependencies)
+  clean           - Remove build artifacts and output directories
+  lint            - Run code linting (automatically installs dependencies)
+  audit           - Run security audit (automatically installs dependencies)
+
+Convenience:
+  setup           - One-command setup: install deps, start infrastructure and API 
+
+Usage: make [target]
+
+Targets:
+  help           Show this help message
+  install        Install dependencies
+  test           Run tests
+  clean          Remove build artifacts and dependencies
+  start-api      Start the API service
+  start-api-d    Start the API service in detached mode
+  stop-api       Stop the API service
+  start-localstack Start LocalStack for local AWS services
+  stop-localstack  Stop LocalStack
+  setup          Install dependencies and start services
+  lint           Run linting checks
+  lint-fix       Automatically fix linting issues where possible
+  audit          Run npm security audit

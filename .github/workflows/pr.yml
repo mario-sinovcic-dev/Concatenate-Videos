@@ -6,25 +6,29 @@ on:
 
 jobs:
   lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    uses: ./.github/workflows/lint-component.yml
+    with:
+      node_version: '18.x'
+      lint_name: 'PR Lint Check'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  # quality:
+      # TODO: Add SonarCloud scanning
+      # - name: SonarCloud Analysis
+      #   uses: SonarSource/sonarcloud-github-action@master
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Run linting
-        run: |
-          docker build -t concatenate-videos-lint -f Dockerfile.test .
-          docker run --rm concatenate-videos-lint npm run lint || true
+      # TODO: Add Wiz security scanning
+      # - name: Wiz Scan
+      #   uses: wiz-sec/wiz-cli@v1
+      #   with:
+      #     auth-token: ${{ secrets.WIZ_TOKEN }}
 
   test:
     needs: lint
     strategy:
       matrix:
-        node_version: ['16.x', '18.x', '20.x']
+        node_version: ['16.x', '18.x', '20.x'] # TODO: check if needed, based on infrastructure
     uses: ./.github/workflows/test-component.yml
     with:
       node_version: ${{ matrix.node_version }}
@@ -39,10 +43,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
 
       - name: Run security audit
-        run: |
-          docker build -t concatenate-videos-security -f Dockerfile.test .
-          docker run --rm concatenate-videos-security npm audit 
+        run: make audit 

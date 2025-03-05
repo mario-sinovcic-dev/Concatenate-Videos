@@ -1,0 +1,30 @@
+name: Lint Component
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: false
+        type: string
+        default: '18.x'
+      lint_name:
+        required: false
+        type: string
+        default: 'Lint Check'
+
+jobs:
+  lint:
+    name: ${{ inputs.lint_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+
+      - name: Run lint
+        run: make lint

@@ -1,4 +1,4 @@
-# TODO- Move deployment automation components into a github-actions/ folder for GHA.
+# TODO- Move deployment automation components into a seperate folder for GHA.
 
 name: Test Component
 
@@ -30,27 +30,18 @@ jobs:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          cd tests && npm ci
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Run tests
+      - name: Install dependencies and run tests
         env:
           JEST_TIMEOUT: 120000  # 2 minutes timeout
         run: |
-          cd tests
-          npm test -- --detectOpenHandles --forceExit --testTimeout=120000 --verbose
+          make test
 
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: |
-            output/
-            tests/coverage/
-          retention-days: 7 
+      # - name: Upload test artifacts TODO -add this back in
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ inputs.artifact_name }}
+      #     path: |
+      #       output/
+      #       tests/coverage/
+      #     retention-days: 7 

@@ -1,13 +1,13 @@
-name: Branch Tests
+name: Feature Branch Workflow
 
 on:
   push:
-    branches-ignore: [ main, master, develop ]
+    branches-ignore: [ main, master, develop ] # TODO - depends on branching strategy
 
 jobs:
   test:
     uses: ./.github/workflows/test-component.yml
     with:
       node_version: '18.x'
-      test_name: 'run Tests in /tests'
+      test_name: 'Run API Tests'
       artifact_name: 'test-output-branch' 
