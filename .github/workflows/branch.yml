@@ -1,0 +1,13 @@
+name: Branch Tests
+
+on:
+  push:
+    branches-ignore: [ main, master, develop ]
+
+jobs:
+  test:
+    uses: ./.github/workflows/test-component.yml
+    with:
+      node_version: '18.x'
+      test_name: 'run Tests in /tests'
+      artifact_name: 'test-output-branch' 

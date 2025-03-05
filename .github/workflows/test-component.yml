@@ -1,0 +1,56 @@
+# TODO- Move deployment automation components into a github-actions/ folder for GHA.
+
+name: Test Component
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      test_name:
+        required: true
+        type: string
+      artifact_name:
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: ${{ inputs.test_name }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd tests && npm ci
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run tests
+        env:
+          JEST_TIMEOUT: 120000  # 2 minutes timeout
+        run: |
+          cd tests
+          npm test -- --detectOpenHandles --forceExit --testTimeout=120000 --verbose
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: |
+            output/
+            tests/coverage/
+          retention-days: 7 

@@ -2,18 +2,28 @@ import got from "got";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 import ffmpeg from "fluent-ffmpeg";
 import { Job } from "./model/job";
+import path from "path";
 
 function writeFile(url: string, destinationFile: string) {
-  return new Promise<void>((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     const writeStream = got
       .stream(url)
       .pipe(createWriteStream(destinationFile));
     writeStream.on("finish", resolve);
+    writeStream.on("error", reject);
   });
 }
 
 function jobDirectory(job: Job): string {
-  return `${job.destination.directory}/${job.id}`;
+  // Use relative path for local development, absolute path for Docker
+  const baseDir = process.env.NODE_ENV === 'development' 
+    ? path.join(process.cwd(), job.destination.directory)
+    : path.resolve(job.destination.directory);
+
+  if (!existsSync(baseDir)) {
+    mkdirSync(baseDir, { recursive: true });
+  }
+  return path.join(baseDir, job.id);
 }
 
 async function downloadVideos(job: Job): Promise<string[]> {
@@ -23,39 +33,53 @@ async function downloadVideos(job: Job): Promise<string[]> {
   }
   let fileIndex = 0;
   const filePaths: string[] = [];
-  await Promise.all(
-    job.sourceVideoUrls.map((url) => {
-      const filePath = `${jobDir}/${fileIndex++}.mp4`;
-      filePaths.push(filePath);
-      writeFile(url, filePath);
-    })
-  );
-  return filePaths;
+  
+  try {
+    await Promise.all(
+      job.sourceVideoUrls.map(async (url) => {
+        const filePath = path.join(jobDir, `${fileIndex++}.mp4`);
+        filePaths.push(filePath);
+        await writeFile(url, filePath);
+      })
+    );
+    return filePaths;
+  } catch (error) {
+    console.error("Error downloading videos:", error);
+    throw error;
+  }
 }
 
 function mergeFiles(job: Job, filePaths: string[]) {
   return new Promise<void>((resolve, reject) => {
+    const outputPath = path.join(jobDirectory(job), "merged.mp4");
     let command = ffmpeg(filePaths[0]);
+    
     filePaths.slice(1).forEach((filePath) => {
       command = command.input(filePath);
     });
-    console.log(`Merging files using command '${command}'`);
+    
+    console.log(`Merging files to: ${outputPath}`);
     command
       .on("error", function (err) {
-        console.log("An error occurred: " + err.message);
+        console.error("An error occurred during merging:", err.message);
         reject(err);
       })
       .on("end", function () {
-        console.log("Merging finished !");
+        console.log("Merging finished successfully!");
         resolve();
       })
-      .mergeToFile(`${jobDirectory(job)}/merged.mp4`);
+      .mergeToFile(outputPath);
   });
 }
 
 export async function processVideos(job: Job) {
-  const filePaths = await downloadVideos(job);
-  console.log(`downloaded ${job.sourceVideoUrls.length} files`);
+  try {
+    const filePaths = await downloadVideos(job);
+    console.log(`Successfully downloaded ${job.sourceVideoUrls.length} files`);
 
-  await mergeFiles(job, filePaths);
+    await mergeFiles(job, filePaths);
+  } catch (error) {
+    console.error("Error processing videos:", error);
+    throw error;
+  }
 }

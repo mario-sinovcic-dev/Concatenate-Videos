@@ -8,6 +8,11 @@ const PORT = 8000;
 
 app.use(bodyParser.json());
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.post("/jobs", async (req, res) => createJob(req, res));
 
 app.get("/jobs/:id/status", async (req, res) => getStatus(req, res));
