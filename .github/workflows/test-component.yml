@@ -1,6 +1,6 @@
 # TODO- Move deployment automation components into a github-actions/ folder for GHA.
 
-name: Reusable Test Workflow
+name: Test Component
 
 on:
   workflow_call:
@@ -38,7 +38,7 @@ jobs:
           docker run --rm \
             -v $(pwd)/output:/app/output \
             -e NODE_ENV=test \
-            concatenate-videos-test-${{ inputs.node_version }} npm test
+            concatenate-videos-test-${{ inputs.node_version }} sh -c "cd tests && npm test"
 
       - name: Upload test artifacts
         if: always()
