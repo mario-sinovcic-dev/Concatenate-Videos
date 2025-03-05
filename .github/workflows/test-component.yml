@@ -24,21 +24,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd tests && npm ci
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and run tests
-        run: |
-          # Convert version format (e.g., '18.x' to '18')
-          NODE_VERSION=$(echo ${{ inputs.node_version }} | cut -d'.' -f1)
-          docker build \
-            --build-arg NODE_VERSION=$NODE_VERSION \
-            -t concatenate-videos-test-${{ inputs.node_version }} \
-            -f Dockerfile.test .
-          docker run --rm \
-            -v $(pwd)/output:/app/output \
-            -e NODE_ENV=test \
-            concatenate-videos-test-${{ inputs.node_version }} sh -c "cd tests && npm test"
+      - name: Run tests
+        run: cd tests && npm test
 
       - name: Upload test artifacts
         if: always()
