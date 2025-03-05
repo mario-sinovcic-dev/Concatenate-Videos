@@ -9,5 +9,5 @@ jobs:
     uses: ./.github/workflows/test-component.yml
     with:
       node_version: '18.x'
-      test_name: 'run Tests in /tests'
-      artifact_name: 'test-output-branch' 
+      test_name: 'Run API Tests'
+      # artifact_name: 'test-output-branch' 
