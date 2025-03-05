@@ -10,4 +10,4 @@ jobs:
     with:
       node_version: '18.x'
       test_name: 'Run API Tests'
-      # artifact_name: 'test-output-branch' 
+      artifact_name: 'test-output-branch' 
