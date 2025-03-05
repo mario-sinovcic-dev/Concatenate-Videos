@@ -30,45 +30,20 @@ jobs:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: linux/amd64
-          buildkitd-flags: "--debug"
-          driver-opts: |
-            image=moby/buildkit:master
-            network=host
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
       - name: Install dependencies
         run: |
-          npm ci --prefer-offline --no-audit
-          cd tests && npm ci --prefer-offline --no-audit
+          npm ci
+          cd tests && npm ci
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Run tests
         env:
-          JEST_TIMEOUT: 60000  # Reduced timeout
-          DOCKER_BUILDKIT: 1
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          BUILDKIT_PROGRESS: plain
-          DOCKER_CLI_EXPERIMENTAL: enabled
+          JEST_TIMEOUT: 120000  # 2 minutes timeout
         run: |
           cd tests
-          # Run tests with optimizations
-          npm test -- \
-            --detectOpenHandles \
-            --forceExit \
-            --testTimeout=60000 \
-            --maxWorkers=2 \
-            --runInBand \
-            --verbose
+          npm test -- --detectOpenHandles --forceExit --testTimeout=120000 --verbose
 
       - name: Upload test artifacts
         if: always()
