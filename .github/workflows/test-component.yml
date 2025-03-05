@@ -14,10 +14,6 @@ on:
       artifact_name:
         required: true
         type: string
-      snyk_token:
-        required: false
-        type: string
-        default: ''
 
 jobs:
   test:
@@ -41,14 +37,6 @@ jobs:
             -v $(pwd)/output:/app/output \
             -e NODE_ENV=test \
             concatenate-videos-test-${{ inputs.node_version }} npm test
-
-      - name: Run security scan
-        if: ${{ inputs.node_version == '18.x' && inputs.snyk_token != '' }}
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ inputs.snyk_token }}
-        with:
-          args: --severity-threshold=high
 
       - name: Upload test artifacts
         if: always()

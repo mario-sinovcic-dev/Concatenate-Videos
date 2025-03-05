@@ -10,5 +10,4 @@ jobs:
     with:
       node_version: '18.x'
       test_name: 'Quick Test'
-      artifact_name: 'test-output-branch'
-      snyk_token: ${{ secrets.SNYK_TOKEN }} 
+      artifact_name: 'test-output-branch' 

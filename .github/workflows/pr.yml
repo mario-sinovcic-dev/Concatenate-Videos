@@ -30,7 +30,6 @@ jobs:
       node_version: ${{ matrix.node_version }}
       test_name: 'PR Test - Node ${{ matrix.node_version }}'
       artifact_name: 'test-output-pr-${{ matrix.node_version }}'
-      snyk_token: ${{ secrets.SNYK_TOKEN }}
 
   security:
     needs: test
