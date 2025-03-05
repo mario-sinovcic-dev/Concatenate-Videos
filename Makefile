@@ -8,16 +8,18 @@ all: help
 .PHONY: install
 install:
 	npm install
+	cd tests && npm install
 
 .PHONY: test
 test: install
-	cd tests/ && npm test
+	cd tests && npm test
 
 .PHONY: clean
 clean: 
 	rm -rf node_modules
 	rm -rf dist
 	rm -rf output
+	cd tests && rm -rf node_modules
 
 .PHONY: start-api
 start-api:
