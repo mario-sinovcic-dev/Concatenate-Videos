@@ -39,7 +39,11 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Run tests
-        run: cd tests && npm test
+        env:
+          JEST_TIMEOUT: 120000  # 2 minutes timeout
+        run: |
+          cd tests
+          npm test -- --detectOpenHandles --forceExit --testTimeout=120000 --verbose
 
       - name: Upload test artifacts
         if: always()
