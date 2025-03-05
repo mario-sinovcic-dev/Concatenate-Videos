@@ -3,16 +3,14 @@ import { promisify } from 'util';
 import axios from 'axios';
 
 const execAsync = promisify(exec);
+const API_URL = 'http://localhost:8000';
 
 // Helper function to manage Docker Compose
 async function runDockerCompose(command: string): Promise<void> {
     try {
-        const { stdout, stderr } = await execAsync(`docker compose ${command}`);
-        console.log(`Docker Compose ${command} completed successfully`);
-        if (stdout) console.log('Output:', stdout);
-        if (stderr) console.error('Errors:', stderr);
+        await execAsync(`docker compose ${command}`);
     } catch (error) {
-        console.error(`Error running docker compose ${command}:`, error);
+        console.error(`Docker Compose error:`, error);
         throw error;
     }
 }
