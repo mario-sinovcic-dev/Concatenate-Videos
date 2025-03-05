@@ -15,6 +15,36 @@ async function runDockerCompose(command: string): Promise<void> {
     }
 }
 
+/**
+ * TODO: Add more test cases to cover:
+ * 1. Error cases:
+ *    - Invalid video URLs
+ *    - Non-existent output directory
+ *    - Invalid request body format
+ *    - Empty video URLs array
+ * 
+ * 2. Edge cases:
+ *    - Very large video files
+ *    - Multiple videos in one request
+ *    - Special characters in output directory path
+ *    - Concurrent job requests
+ * 
+ * 3. Job status checks:
+ *    - Verify job status transitions (pending -> inProgress -> done)
+ *    - Check job status for non-existent job ID
+ *    - Verify job completion with actual output file
+ * 
+ * 4. Performance tests:
+ *    - Measure response times
+ *    - Test under load
+ *    - Memory usage monitoring
+ * 
+ * 5. Integration scenarios:
+ *    - Complete workflow from job creation to file download
+ *    - Verify output file format and content
+ *    - Test cleanup of temporary files
+ */
+
 describe('Video Concatenation API', () => {
     // Arrange
     beforeAll(async () => {

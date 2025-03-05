@@ -48,12 +48,32 @@ npm start
 
 The API will run on port 8000.
 
+### Running Tests
+
+The project includes integration tests that verify the API functionality:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (for development)
+npm test -- --watch
+
+# Run tests with coverage report [TODO - currently, not configured correctly]
+npm test -- --coverage
+```
+
+The tests will:
+1. Start the application in Docker
+2. Run the test suite
+3. Clean up Docker resources
+
 ### API Call Flow
 
 ```
 POST /jobs
 {
-    "sourceVideoUrls": ["<url to mp4>", "<url to another mp4>"]
+    "sourceVideoUrls": ["<url to mp4>", "<url to another mp4>"],
     "destination": {
         "directory": "<local path of directory that'll store merged file>"
     }
