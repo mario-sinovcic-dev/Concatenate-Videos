@@ -7,8 +7,10 @@ const execAsync = promisify(exec);
 // Helper function to manage Docker Compose
 async function runDockerCompose(command: string): Promise<void> {
     try {
-        await execAsync(`docker compose ${command}`);
+        const { stdout, stderr } = await execAsync(`docker compose ${command}`);
         console.log(`Docker Compose ${command} completed successfully`);
+        if (stdout) console.log('Output:', stdout);
+        if (stderr) console.error('Errors:', stderr);
     } catch (error) {
         console.error(`Error running docker compose ${command}:`, error);
         throw error;
@@ -45,19 +47,43 @@ async function runDockerCompose(command: string): Promise<void> {
  *    - Test cleanup of temporary files
  */
 
+jest.setTimeout(120000); // Set timeout for all tests
+
 describe('Video Concatenation API', () => {
     // Arrange
     beforeAll(async () => {
         // Start Docker Compose before all tests
         await runDockerCompose('up -d --build');
-        // Wait for API to be ready
-        await new Promise(resolve => setTimeout(resolve, 5000));
-    });
+        
+        // Wait for API to be ready with health check
+        let isApiReady = false;
+        const maxRetries = 30;
+        const retryInterval = 2000;
+        
+        for (let i = 0; i < maxRetries && !isApiReady; i++) {
+            try {
+                await axios.get('http://localhost:8000/health');
+                isApiReady = true;
+                console.log('API is ready');
+            } catch (error) {
+                console.log(`API not ready, attempt ${i + 1}/${maxRetries}`);
+                await new Promise(resolve => setTimeout(resolve, retryInterval));
+            }
+        }
+
+        if (!isApiReady) {
+            throw new Error('API failed to become ready');
+        }
+    }, 120000); // 2 minute timeout for setup
 
     // Cleanup after all tests
     afterAll(async () => {
-        await runDockerCompose('down');
-    });
+        try {
+            await runDockerCompose('down');
+        } catch (error) {
+            console.error('Error during cleanup:', error);
+        }
+    }, 30000); // 30 second timeout for cleanup
 
     it('should create a job successfully', async () => {
         // Arrange
@@ -77,5 +103,5 @@ describe('Video Concatenation API', () => {
         expect(response.data).toHaveProperty('status');
         expect(typeof response.data.id).toBe('string');
         expect(response.data.id.length).toBeGreaterThan(0);
-    });
+    }, 30000); // 30 second timeout for the test
 }); 
