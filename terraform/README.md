@@ -14,6 +14,52 @@ This Terraform configuration manages the infrastructure for the video concatenat
 - SQS queue for job processing
 - RDS PostgreSQL for job metadata
 
+## Local Development
+1. Start the local infrastructure:
+```bash
+./scripts/local-infra.sh start
+```
+
+2. Configure dummy AWS credentials for LocalStack:
+```bash
+aws configure set aws_access_key_id "dummy"
+aws configure set aws_secret_access_key "dummy"
+aws configure set region "us-east-1"
+```
+
+3. Test the infrastructure:
+```bash
+# Check overall status
+./scripts/local-infra.sh status
+
+# Test S3
+aws --endpoint-url=http://localhost:4566 s3 ls
+aws --endpoint-url=http://localhost:4566 s3 mb s3://test-bucket
+aws --endpoint-url=http://localhost:4566 s3 cp README.md s3://test-bucket/
+aws --endpoint-url=http://localhost:4566 s3 ls s3://test-bucket/
+
+# Test SQS
+aws --endpoint-url=http://localhost:4566 sqs list-queues
+aws --endpoint-url=http://localhost:4566 sqs send-message \
+    --queue-url http://localhost:4566/000000000000/local-video-jobs \
+    --message-body "test message"
+aws --endpoint-url=http://localhost:4566 sqs receive-message \
+    --queue-url http://localhost:4566/000000000000/local-video-jobs
+
+# Test PostgreSQL
+
+# Show database version and connection info
+psql -h localhost -U postgres -d video_jobs -c "SELECT version();"
+
+# Default credentials: username=postgres, password=postgres
+psql -h localhost -U postgres -d video_jobs -c "\dt"
+```
+
+4. Stop the infrastructure:
+```bash
+./scripts/local-infra.sh stop
+```
+
 ## Structure
 ```
 terraform/
@@ -40,30 +86,6 @@ For AWS environments:
 - `AWS_REGION`
 - `TF_VAR_db_password`
 
-## Local Development
-1. Start the local infrastructure:
-```bash
-./scripts/local-infra.sh start
-```
-
-2. Verify the setup:
-```bash
-# Check service status
-./scripts/local-infra.sh status
-
-# Test AWS services
-aws --endpoint-url=http://localhost:4566 s3 ls
-aws --endpoint-url=http://localhost:4566 sqs list-queues
-
-# Test database connection
-psql -h localhost -U postgres -d video_jobs
-```
-
-3. Stop the infrastructure:
-```bash
-./scripts/local-infra.sh stop
-```
-
 ## AWS Deployment
 1. Initialize Terraform:
 ```bash
@@ -79,4 +101,4 @@ export TF_VAR_db_password="your-secure-password"
 3. Apply configuration:
 ```bash
 terraform apply
-``` 
+```
