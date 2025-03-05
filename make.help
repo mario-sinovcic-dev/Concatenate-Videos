@@ -11,6 +11,8 @@ Development:
   install          - Install Node.js dependencies
   test            - Run the test suite (automatically installs dependencies)
   clean           - Remove build artifacts and output directories
+  lint            - Run code linting (automatically installs dependencies)
+  audit           - Run security audit (automatically installs dependencies)
 
 Convenience:
   setup           - One-command setup: install deps, start infrastructure and API 

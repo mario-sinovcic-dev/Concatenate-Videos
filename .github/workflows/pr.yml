@@ -12,13 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
 
-      - name: Run linting
-        run: |
-          docker build -t concatenate-videos-lint -f Dockerfile.test .
-          docker run --rm concatenate-videos-lint npm run lint || true
+      - name: Run lint
+        run: make lint
 
   test:
     needs: lint
@@ -39,10 +40,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
 
       - name: Run security audit
-        run: |
-          docker build -t concatenate-videos-security -f Dockerfile.test .
-          docker run --rm concatenate-videos-security npm audit 
+        run: make audit 

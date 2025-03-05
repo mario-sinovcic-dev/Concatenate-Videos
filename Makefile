@@ -40,7 +40,15 @@ stop-localstack:
 	./scripts/local-infra.sh stop
 
 .PHONY: setup
-setup: install start-api-d start-localstack 
+setup: install start-api-d start-localstack
+
+.PHONY: lint
+lint: install
+	npm run lint
+
+.PHONY: audit
+audit: install
+	npm audit
 
 .PHONY: create-job get-status
 create-job:
