@@ -11,6 +11,12 @@ import { saveJob, getJob, getNextPendingJob, updateStatus } from '../repository/
 import { processVideos } from './videoProcessor';
 import logger from '../utils/logger';
 
+// TODO: Update job service to use SQS for job queue
+// TODO: Use S3 for video storage instead of local filesystem
+// TODO: Add CloudWatch metrics for job processing
+// TODO: Implement job status updates via DynamoDB streams
+// TODO: Add retries and DLQ handling
+
 export async function createJob(createJobRequest: CreateJobRequest): Promise<CreateJobResponse> {
   const jobId = uuid();
   logger.info({ jobId, request: createJobRequest }, 'Creating new job');

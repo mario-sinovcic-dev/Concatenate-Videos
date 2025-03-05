@@ -11,6 +11,11 @@ jobs:
       node_version: '18.x'
       lint_name: 'Main Branch Lint Check'
 
+  # TODO: Add infrastructure validation
+  # - Check for drift in prod environment
+  # - Validate all Terraform configs
+  # - Run security checks on infrastructure
+
   test:
     needs: lint
     strategy:
@@ -34,6 +39,10 @@ jobs:
       #   uses: wiz-sec/wiz-cli@v1
       #   with:
       #     auth-token: ${{ secrets.WIZ_TOKEN }}
+
+  # plan:
+    # add steps to run tf plan for each environment, via make target
+    # - Require approval before going to each environment
 
   # deploy:
     # TODO: Add actual deployment steps - gated based on enviroment: dev, staging, production
