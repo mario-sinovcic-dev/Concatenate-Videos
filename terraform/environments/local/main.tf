@@ -1,31 +1,22 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
+# Resource configurations for local environment
+
+module "database" {
+  source = "../../modules/database"
+
+  identifier        = "${local.prefix}-db"
+  database_name     = "video_jobs"
+  username         = var.db_username
+  password         = var.db_password
+  environment      = local.environment
+  
+  # LocalStack dummy values since we're using real PostgreSQL container
+  vpc_id                  = "vpc-dummy"
+  subnet_ids              = ["subnet-dummy1", "subnet-dummy2"]
+  allowed_security_groups = []
+  
+  tags = local.tags
 }
 
-provider "aws" {
-  region                      = "us-east-1"
-  access_key                  = "test"
-  secret_key                  = "test"
-  skip_credentials_validation = true
-  skip_metadata_api_check     = true
-  skip_requesting_account_id  = true
-
-  endpoints {
-    s3  = "http://localhost:4566"
-    sqs = "http://localhost:4566"
-    rds = "http://localhost:4566"
-  }
-}
-
-module "storage" {
-  source = "../../modules/storage"
-
-  environment = "local"
-  db_username = "postgres"
-  db_password = "postgres"
-} 
+# TODO: Add queue module for SQS
+# TODO: Add storage module for S3
+# TODO: Add compute module for ECS/Fargate
