@@ -34,11 +34,12 @@ import axios from 'axios';
 
 const execAsync = promisify(exec);
 const API_URL = 'http://localhost:8000';
+const DOCKER_COMPOSE_FILE = 'docker-compose.api.yml';
 
 // Helper function to manage Docker Compose
 async function runDockerCompose(command: string): Promise<void> {
   try {
-    await execAsync(`docker compose ${command}`);
+    await execAsync(`docker compose -f ${DOCKER_COMPOSE_FILE} ${command}`);
   } catch (error) {
     console.error(`Docker Compose error:`, error);
     throw error;
@@ -51,7 +52,7 @@ describe('Video Concatenation API', () => {
   // Arrange
   beforeAll(async () => {
     // Start Docker Compose before all tests
-    await runDockerCompose('up -d --build');
+    await runDockerCompose('up --build -d app');
 
     // Wait for API to be ready with health check
     let isApiReady = false;
@@ -95,7 +96,7 @@ describe('Video Concatenation API', () => {
     };
 
     // Act
-    const response = await axios.post('http://localhost:8000/jobs', requestBody);
+    const response = await axios.post(`${API_URL}/jobs`, requestBody);
 
     // Assert
     expect(response.status).toBe(201);

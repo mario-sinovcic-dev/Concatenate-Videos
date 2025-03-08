@@ -21,19 +21,23 @@ clean:
 
 .PHONY: start-api
 start-api:
-	docker compose up --build app
+	docker compose -f docker-compose.api.yml up --build app
 
 .PHONY: start-api-d
 start-api-d:
-	docker compose up -d --build app
+	docker compose -f docker-compose.api.yml up -d --build app
 
 .PHONY: stop-api
 stop-api:
-	docker compose stop app
+	docker compose -f docker-compose.api.yml stop app
 
 .PHONY: start-localstack
 start-localstack:
 	./scripts/local-infra.sh start
+
+.PHONY: status-localstack
+status-localstack:
+	./scripts/local-infra.sh status
 
 .PHONY: stop-localstack
 stop-localstack:
@@ -41,6 +45,9 @@ stop-localstack:
 
 .PHONY: setup
 setup: install start-api-d start-localstack
+
+.PHONY: teardown
+teardown: stop-api stop-localstack
 
 .PHONY: lint
 lint: install
