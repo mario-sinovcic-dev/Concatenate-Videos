@@ -25,14 +25,14 @@ apply_terraform() {
 case "$1" in
     "start")
         # Start LocalStack and PostgreSQL
-        docker compose -f docker-compose.local.yml up -d
+        docker compose -f ./localstack/docker-compose.yml --profile infra up -d
         wait_for_localstack
         apply_terraform
         echo "Local infrastructure is ready!"
         ;;
     "stop")
         # Stop and clean up
-        docker compose -f docker-compose.local.yml down
+        docker compose -f ./localstack/docker-compose.yml --profile infra down
         echo "Local infrastructure stopped."
         ;;
     "status")
@@ -40,7 +40,7 @@ case "$1" in
         echo "LocalStack health check:"
         curl -s http://localhost:4566/_localstack/health
         echo -e "\n\nPostgreSQL check:"
-        docker compose -f docker-compose.local.yml ps postgres
+        docker compose -f ./localstack/docker-compose.yml ps postgres
         ;;
     *)
         echo "Usage: $0 {start|stop|status}"

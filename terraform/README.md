@@ -13,10 +13,42 @@ This Terraform configuration manages the infrastructure for the video concatenat
 - S3 bucket for video storage
 - SQS queue for job processing
 - RDS PostgreSQL for job metadata
+- ECS/Fargate for service deployment
+- VPC with proper networking (dev/prod only)
+
+## Structure
+```
+terraform/
+├── environments/          # Environment-specific configurations
+│   ├── local/            # Local development environment
+│   │   ├── main.tf       # Resource definitions
+│   │   ├── locals.tf     # Environment variables and tags
+│   │   ├── providers.tf  # Provider configuration
+│   │   ├── backend.tf    # State configuration
+│   │   ├── variables.tf  # Input variables
+│   │   ├── versions.tf   # Version constraints
+│   │   └── outputs.tf    # Output definitions
+│   └── dev/             # Development environment
+│       ├── main.tf      # Resource definitions
+│       ├── locals.tf    # Environment variables and tags
+│       ├── providers.tf # Provider configuration
+│       ├── backend.tf   # State configuration
+│       ├── variables.tf # Input variables
+│       ├── versions.tf  # Version constraints
+│       └── outputs.tf   # Output definitions
+└── modules/             # Reusable modules
+    ├── database/       # RDS configuration
+    ├── storage/        # S3 and SQS configuration
+    └── compute/        # ECS/Fargate configuration TODO
+```
 
 ## Local Development
 1. Start the local infrastructure:
 ```bash
+# Start LocalStack and PostgreSQL
+docker compose -f docker-compose.yml up -d
+
+# Or use the helper script
 ./scripts/local-infra.sh start
 ```
 
@@ -27,7 +59,15 @@ aws configure set aws_secret_access_key "dummy"
 aws configure set region "us-east-1"
 ```
 
-3. Test the infrastructure:
+3. Apply Terraform configuration:
+```bash
+cd environments/local
+terraform init
+terraform plan
+terraform apply
+```
+
+4. Test the infrastructure:
 ```bash
 # Check overall status
 ./scripts/local-infra.sh status
@@ -47,7 +87,6 @@ aws --endpoint-url=http://localhost:4566 sqs receive-message \
     --queue-url http://localhost:4566/000000000000/local-video-jobs
 
 # Test PostgreSQL
-
 # Show database version and connection info
 psql -h localhost -U postgres -d video_jobs -c "SELECT version();"
 
@@ -55,50 +94,91 @@ psql -h localhost -U postgres -d video_jobs -c "SELECT version();"
 psql -h localhost -U postgres -d video_jobs -c "\dt"
 ```
 
-4. Stop the infrastructure:
+5. Stop the infrastructure:
 ```bash
 ./scripts/local-infra.sh stop
 ```
 
-## Structure
-```
-terraform/
-├── modules/
-│   └── storage/           # Core infrastructure module
-├── environments/
-│   ├── dev/              # Development environment
-│   ├── local/            # Local development (LocalStack)
-│   └── prod/             # Production environment (TBD)
-├── backend.tf            # State configuration
-├── providers.tf          # AWS provider config
-├── variables.tf          # Root variables
-└── versions.tf           # Version constraints
+## Development Environment
+1. Assume the correct AWS role:
+```bash
+aws sts assume-role --role-arn "arn:aws:iam::ACCOUNT_ID:role/TerraformRole" --role-session-name "terraform"
 ```
 
-## Environment Variables
-For local development:
-- No AWS credentials needed (LocalStack uses dummy values)
-- Database credentials are preset in docker-compose.local.yml
-
-For AWS environments:
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION`
-- `TF_VAR_db_password`
-
-## AWS Deployment
-1. Initialize Terraform:
+2. Apply Terraform configuration:
 ```bash
 cd environments/dev
 terraform init
-```
-
-2. Set required variables:
-```bash
-export TF_VAR_db_password="your-secure-password"
-```
-
-3. Apply configuration:
-```bash
+terraform plan
 terraform apply
 ```
+
+3. Verify the infrastructure:
+```bash
+# Test S3 bucket
+aws s3 ls s3://${prefix}-videos/
+
+# Test SQS queue
+aws sqs get-queue-attributes \
+    --queue-url $(terraform output -raw sqs_queue_url) \
+    --attribute-names All
+
+# Test RDS connection
+psql -h $(terraform output -raw database_endpoint) \
+     -U $(terraform output -raw database_username) \
+     -d video_jobs
+```
+
+## Security Notes
+- Database credentials are managed via AWS Secrets Manager
+- All sensitive variables are marked with `sensitive = true`
+- Infrastructure uses private subnets where possible
+- VPC Flow Logs enabled for network monitoring
+- IAM roles follow least privilege principle
+
+## Contribution Guidelines
+
+### File Organization
+1. **Keep Environments Consistent**
+   - Each environment should have the same file structure
+   - Use `locals.tf` for environment-specific values
+   - Keep resource definitions in `main.tf`
+
+2. **Module Usage**
+   - Use official AWS modules when available
+   - Pin module versions using `version = "~> X.Y"`
+   - Document module inputs/outputs
+
+3. **Variable Management**
+   - Use `locals.tf` for environment-specific values
+   - Use `variables.tf` for configurable inputs
+   - Mark sensitive values with `sensitive = true`
+
+### Best Practices
+1. **State Management**
+   - Use remote state for non-local environments
+   - Enable state locking with DynamoDB
+   - Use separate state files per environment
+
+2. **Security**
+   - Store secrets in AWS Secrets Manager
+   - Use IAM roles with least privilege
+   - Enable encryption at rest
+   - Use security groups judiciously
+
+3. **Naming Conventions**
+   - Use `local.prefix` for resource naming
+   - Follow `{prefix}-{resource}-{suffix}` pattern
+   - Use consistent tagging via `local.tags`
+
+4. **Code Quality**
+   - Run `terraform fmt` before committing
+   - Run `terraform validate` before PR
+   - Update documentation when changing structure
+   - Add meaningful comments for complex configurations
+
+5. **Pull Requests**
+   - Include `terraform plan` output
+   - Update README if adding new components
+   - Follow existing file structure
+   - Test changes in local environment first

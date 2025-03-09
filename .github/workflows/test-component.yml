@@ -1,5 +1,4 @@
 # TODO- Move deployment automation components into a seperate folder for GHA.
-
 name: Test Component
 
 on:
@@ -29,6 +28,10 @@ jobs:
         with:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
+
+      - name: Run make build
+        run: |
+          make build
 
       - name: Install dependencies and run tests
         env:

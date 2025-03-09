@@ -1,3 +1,9 @@
+// TODO: Use ECS/Fargate for video processing
+// TODO: Implement S3 upload/download for videos
+// TODO: Add CloudWatch metrics for processing time
+// TODO: Use Step Functions for orchestration
+// TODO: Add SNS notifications for job completion
+
 import got from 'got';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import ffmpeg from 'fluent-ffmpeg';

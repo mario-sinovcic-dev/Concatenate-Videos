@@ -1,4 +1,5 @@
 API Service:
+  build            - Build API service docker image
   start-api        - Start the API service in interactive mode
   start-api-d      - Start the API service in detached mode
   stop-api         - Stop the API service
@@ -12,6 +13,7 @@ Development:
   test            - Run the test suite (automatically installs dependencies)
   clean           - Remove build artifacts and output directories
   lint            - Run code linting (automatically installs dependencies)
+  lint-fix        - Fix code linting errors
   audit           - Run security audit (automatically installs dependencies)
 
 Convenience:
@@ -22,6 +24,7 @@ Usage: make [target]
 Targets:
   help           Show this help message
   install        Install dependencies
+  build          Build docker image
   test           Run tests
   clean          Remove build artifacts and dependencies
   start-api      Start the API service

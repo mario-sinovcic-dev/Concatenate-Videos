@@ -23,11 +23,11 @@ A service for concatenating video files using Node.js and AWS services.
 # Info on all make targets
 make help
 
+# Build the app (takes a while due to ffmpeg)
+make build
+
 # Run tests
 make test
-
-# Install, build and start API and localstack
-make setup
 
 # Just start the API service
 make start-api
@@ -35,8 +35,8 @@ make start-api
 # Stop the API service
 make stop-api
 
-# Stop the localstack service
-make stop-localstack 
+# Install, build and start API and localstack
+make setup
 ```
 
 The API will run on port 8000.

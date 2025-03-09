@@ -11,6 +11,11 @@ jobs:
       node_version: '18.x'
       lint_name: 'PR Lint Check'
 
+  # TODO: Add infrastructure validation job
+  # - Validate Terraform configs
+  # - Run terraform plan for all environments
+  # - Check for drift in existing environments
+
   # quality:
       # TODO: Add SonarCloud scanning
       # - name: SonarCloud Analysis
@@ -50,4 +55,16 @@ jobs:
           cache: 'npm'
 
       - name: Run security audit
-        run: make audit 
+        run: make audit
+
+  #plan-dev:
+    # TODO: Add terraform plan job [dev]
+    # - Run tf plan for test environment
+    # - Save plan artifact for apply job
+    # - Post plan summary as PR comment
+
+  #apply-dev:
+  # TODO: Add terraform apply job
+  # - Requires manual approval
+  # - Use saved plan from previous job
+  # - Update PR with deployment status 
