@@ -1,7 +1,11 @@
-### Enviroment Variables
+### Environment Variables
 
 IMAGE_NAME := concatinate-videos-api
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
+
+# Default paths for docker-compose and localstack scripts
+DOCKER_COMPOSE_FILE := localstack/docker-compose.yml
+LOCALSTACK_SCRIPT := ./localstack/scripts/local-infra.sh
 
 ### Targets
 
@@ -32,30 +36,30 @@ clean:
 
 .PHONY: start-api
 start-api:
-	IMAGE_TAG=$(GIT_COMMIT) docker compose -f localstack/docker-compose.yml --profile api up
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f $(DOCKER_COMPOSE_FILE) --profile api up
 
 .PHONY: start-api-d
 start-api-d:
-	IMAGE_TAG=$(GIT_COMMIT) docker compose -f localstack/docker-compose.yml --profile api up -d
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f $(DOCKER_COMPOSE_FILE) --profile api up -d
 
 .PHONY: stop-api
 stop-api:
-	docker compose -f localstack/docker-compose.yml --profile api stop app
+	docker compose -f $(DOCKER_COMPOSE_FILE) --profile api stop app
 
 .PHONY: start-localstack
 start-localstack:
-	./localstack/scripts/local-infra.sh start
+	$(LOCALSTACK_SCRIPT) start
 
 .PHONY: status-localstack
 status-localstack:
-	./localstack/scripts/local-infra.sh status
+	$(LOCALSTACK_SCRIPT) status
 
 .PHONY: stop-localstack
 stop-localstack:
-	./localstack/scripts/local-infra.sh stop
+	$(LOCALSTACK_SCRIPT) stop
 
 .PHONY: setup
-setup: install start-api-d start-localstack
+setup: install build start-api-d start-localstack
 
 .PHONY: teardown
 teardown: stop-api stop-localstack
