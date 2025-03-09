@@ -46,7 +46,7 @@ terraform/
 1. Start the local infrastructure:
 ```bash
 # Start LocalStack and PostgreSQL
-docker compose -f docker-compose.api.yml up -d
+docker compose -f docker-compose.yml up -d
 
 # Or use the helper script
 ./scripts/local-infra.sh start

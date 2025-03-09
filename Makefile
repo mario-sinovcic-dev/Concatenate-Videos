@@ -21,7 +21,7 @@ build:
 	docker build -t $(IMAGE_NAME):$(GIT_COMMIT) .
 
 .PHONY: test
-test: install
+test: install build
 	npm test
 
 .PHONY: clean
@@ -32,15 +32,15 @@ clean:
 
 .PHONY: start-api
 start-api:
-	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.api.yml up
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.yml --profile api up
 
 .PHONY: start-api-d
 start-api-d:
-	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.api.yml up -d
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.yml --profile api up -d
 
 .PHONY: stop-api
 stop-api:
-	docker compose -f docker-compose.api.yml stop app
+	docker compose -f docker-compose.yml --profile api stop app
 
 .PHONY: start-localstack
 start-localstack:

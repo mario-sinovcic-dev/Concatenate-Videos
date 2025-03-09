@@ -34,7 +34,7 @@ import axios from 'axios';
 
 const execAsync = promisify(exec);
 const API_URL = 'http://localhost:8000';
-const DOCKER_COMPOSE_FILE = 'docker-compose.api.yml';
+const DOCKER_COMPOSE_FILE = 'docker-compose.yml';
 
 // Get the latest Git commit hash
 async function getGitCommitHash(): Promise<string> {
@@ -46,7 +46,9 @@ async function getGitCommitHash(): Promise<string> {
 async function runDockerCompose(command: string): Promise<void> {
   try {
     const commitHash = await getGitCommitHash();
-    await execAsync(`IMAGE_TAG=${commitHash} docker compose -f ${DOCKER_COMPOSE_FILE} ${command}`);
+    await execAsync(
+      `IMAGE_TAG=${commitHash} docker compose -f ${DOCKER_COMPOSE_FILE} --profile api ${command}`,
+    );
   } catch (error) {
     console.error(`Docker Compose error:`, error);
     throw error;

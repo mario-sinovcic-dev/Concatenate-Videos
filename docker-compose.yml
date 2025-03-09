@@ -1,4 +1,22 @@
 services:
+  app:
+    image: concatinate-videos-api:${IMAGE_TAG} # TODO - get this from ECR if not running locally
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./output:/app/output:rw
+    environment:
+      - NODE_ENV=development
+    user: "node"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 
+    profiles:
+      - api
+
   localstack:
     image: localstack/localstack:latest
     ports:
@@ -14,6 +32,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - local-infra
+    profiles:
+      - infra
 
   postgres:
     image: postgres:14-alpine
@@ -32,6 +52,8 @@ services:
       retries: 5
     networks:
       - local-infra
+    profiles:
+      - infra
 
 volumes:
   postgres_data:
