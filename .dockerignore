@@ -20,8 +20,8 @@ npm-debug.log*
 .prettierrc*
 
 # Docker
+localstack/
 Dockerfile*
-docker-compose*.yml
 .dockerignore
 
 # IDE & Editor
