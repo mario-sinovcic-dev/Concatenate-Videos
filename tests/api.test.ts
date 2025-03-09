@@ -36,10 +36,17 @@ const execAsync = promisify(exec);
 const API_URL = 'http://localhost:8000';
 const DOCKER_COMPOSE_FILE = 'docker-compose.api.yml';
 
+// Get the latest Git commit hash
+async function getGitCommitHash(): Promise<string> {
+  const { stdout } = await execAsync('git rev-parse --short HEAD');
+  return stdout.trim();
+}
+
 // Helper function to manage Docker Compose
 async function runDockerCompose(command: string): Promise<void> {
   try {
-    await execAsync(`docker compose -f ${DOCKER_COMPOSE_FILE} ${command}`);
+    const commitHash = await getGitCommitHash();
+    await execAsync(`IMAGE_TAG=${commitHash} docker compose -f ${DOCKER_COMPOSE_FILE} ${command}`);
   } catch (error) {
     console.error(`Docker Compose error:`, error);
     throw error;
@@ -52,7 +59,7 @@ describe('Video Concatenation API', () => {
   // Arrange
   beforeAll(async () => {
     // Start Docker Compose before all tests
-    await runDockerCompose('up --build -d app');
+    await runDockerCompose('up -d');
 
     // Wait for API to be ready with health check
     let isApiReady = false;

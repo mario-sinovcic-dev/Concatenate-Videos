@@ -1,3 +1,10 @@
+### Enviroment Variables
+
+IMAGE_NAME := concatinate-videos-api
+GIT_COMMIT := $(shell git rev-parse --short HEAD)
+
+### Targets
+
 .PHONY: help
 help:
 	@cat make.help
@@ -8,6 +15,10 @@ all: help
 .PHONY: install
 install:
 	npm install
+
+.PHONY: build
+build:
+	docker build -t $(IMAGE_NAME):$(GIT_COMMIT) .
 
 .PHONY: test
 test: install
@@ -21,11 +32,11 @@ clean:
 
 .PHONY: start-api
 start-api:
-	docker compose -f docker-compose.api.yml up --build app
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.api.yml up
 
 .PHONY: start-api-d
 start-api-d:
-	docker compose -f docker-compose.api.yml up -d --build app
+	IMAGE_TAG=$(GIT_COMMIT) docker compose -f docker-compose.api.yml up -d
 
 .PHONY: stop-api
 stop-api:

@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: concatinate-videos-api:${IMAGE_TAG} # TODO - get this from ECR if not running locally
     ports:
       - "8000:8000"
     volumes:
@@ -16,4 +16,4 @@ services:
       retries: 3 
 
 
-# TODO - rename this to docker-compose.api.yml 
+# TODO - merge with other docker compose and add profiles
