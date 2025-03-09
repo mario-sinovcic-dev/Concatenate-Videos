@@ -1,6 +1,8 @@
-FROM node:18-slim
+# Build stage
+FROM node:18-slim AS builder
 
-# Install ffmpeg and curl
+# Install ffmpeg and curl - needed to run api tests
+# TODO - move this to prod stage, if we're planning on adding unit tests instead
 RUN apt-get update && \
     apt-get install -y ffmpeg curl && \
     apt-get clean && \
@@ -17,13 +19,20 @@ RUN mkdir -p /app/output && \
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy source code
+# Copy source code, excpet .dockerignore specs
+# TODO - bit of a smell, look to create staged builds for prod and test
 COPY . .
 
 # Build TypeScript
 RUN npm run build
+
+# Production stage
+FROM builder AS production
+
+# Set NODE_ENV
+ENV NODE_ENV=production
 
 # Switch to non-root user
 USER node

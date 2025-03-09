@@ -1,0 +1,45 @@
+ # Build artifacts
+dist/
+output/
+*.log
+coverage/
+
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Version control
+.git/
+.gitignore
+.github/
+
+# Environment & config
+.env*
+.editorconfig
+.eslintrc*
+.prettierrc*
+
+# Docker
+localstack/
+Dockerfile*
+.dockerignore
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+docs/
+
+# Terraform
+terraform/
+.terraform/
+*.tfstate*
+*.tfvars
