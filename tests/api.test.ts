@@ -34,7 +34,7 @@ import axios from 'axios';
 
 const execAsync = promisify(exec);
 const API_URL = 'http://localhost:8000';
-const DOCKER_COMPOSE_FILE = 'docker-compose.yml';
+const DOCKER_COMPOSE_FILE = 'localstack/docker-compose.yml';
 
 // Get the latest Git commit hash
 async function getGitCommitHash(): Promise<string> {
