@@ -1,7 +1,8 @@
 # Resource configurations for dev environment
 
-#  TODO - Networking - depends on existig infra
-# Use existing VPC and subnets if already created (import via data.tf)
+# TODO - Create ECR / ECS Cluster / Task Definition / Service for running the service
+# TODO - Networking - depends on existig infra
+#        Use existing VPC and subnets if already created (import via data.tf)
 
 # Generate random password for RDS
 resource "random_password" "db_password" {
@@ -49,4 +50,4 @@ module "storage" {
   environment = local.environment
 }
 
-# TODO - Create ECR / ECS Cluster / Task Definition / Service for running the service
+
