@@ -8,6 +8,8 @@ export IMAGE_TAG=${IMAGE_TAG:-latest}
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 LOCALSTACK_DIR="$SCRIPT_DIR/.."
 PROJECT_ROOT="$LOCALSTACK_DIR/.."
+TF_DIR="$PROJECT_ROOT/terraform/environments/local"
+TF_DATA_DIR="$LOCALSTACK_DIR/.terraform"
 
 function wait_for_localstack() {
     echo "Waiting for LocalStack to be ready..."
@@ -53,12 +55,17 @@ function setup_aws_local() {
 
 function setup_terraform() {
     echo "Setting up Terraform for LocalStack..."
-    cd "$PROJECT_ROOT/terraform/environments/local"
+    
+    # Create and set Terraform data directory
+    mkdir -p "$TF_DATA_DIR"
+    export TF_DATA_DIR="$TF_DATA_DIR"
     
     # Configure Terraform environment variables
     export AWS_ACCESS_KEY_ID="test"
     export AWS_SECRET_ACCESS_KEY="test"
     export AWS_DEFAULT_REGION="us-east-1"
+    
+    cd "$TF_DIR"
     
     # Initialize and apply Terraform
     echo "Initializing Terraform..."
@@ -95,7 +102,8 @@ case "$1" in
         echo "Checking LocalStack status..."
         curl -s http://localhost:4566/_localstack/health | jq .
         echo -e "\nChecking Terraform state..."
-        cd "$PROJECT_ROOT/terraform/environments/local" && terraform show
+        export TF_DATA_DIR="$TF_DATA_DIR"
+        cd "$TF_DIR" && terraform show
         ;;
     
     restart)
@@ -106,10 +114,18 @@ case "$1" in
 
     destroy)
         echo "Destroying local infrastructure..."
-        cd "$PROJECT_ROOT/terraform/environments/local"
         terraform destroy -auto-approve
-        cd - > /dev/null
         $0 stop
+        $0 clean
+        echo "Infrastructure destroyed"
+        ;;
+
+    clean)
+        echo "Cleaning up Terraform data..."
+        rm -rf "$TF_DATA_DIR"
+        rm -rf "$TF_DIR/.terraform.lock.hcl"
+        rm -f "terraform.tfstate"
+        echo "Terraform data cleaned"
         ;;
 
     logs)
@@ -119,7 +135,7 @@ case "$1" in
         ;;
 
     *)
-        echo "Usage: $0 {start|stop|status|restart|destroy|logs}"
+        echo "Usage: $0 {start|stop|status|restart|destroy|clean|logs}"
         echo
         echo "Commands:"
         echo "  start    - Start LocalStack and initialize infrastructure"
@@ -127,6 +143,7 @@ case "$1" in
         echo "  status   - Show LocalStack and Terraform status"
         echo "  restart  - Restart LocalStack"
         echo "  destroy  - Destroy infrastructure and stop LocalStack"
+        echo "  clean    - Clean up Terraform data"
         echo "  logs     - Show LocalStack logs"
         exit 1
         ;;

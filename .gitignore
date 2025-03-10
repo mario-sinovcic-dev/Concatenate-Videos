@@ -1,6 +1,10 @@
-
 .DS_Store
 node_modules/*
 output/*
 tests/node_modules/*
 tests/coverage/*
+
+# Terraform
+*.tfstate
+localstack/.terraform/
+terraform/environments/local/.terraform.lock.hcl

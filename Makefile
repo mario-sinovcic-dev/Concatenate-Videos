@@ -58,6 +58,10 @@ status-localstack:
 stop-localstack:
 	$(LOCALSTACK_SCRIPT) stop
 
+.PHONY: destroy-localstack
+destroy-localstack:
+	$(LOCALSTACK_SCRIPT) destroy
+
 .PHONY: setup
 setup: install build start-api-d start-localstack
 
