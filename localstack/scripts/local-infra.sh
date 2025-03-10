@@ -28,9 +28,9 @@ function wait_for_localstack() {
             continue
         fi
 
-        # Check if S3 is available
-        if echo "$health_output" | jq -e '.services.s3 == "available"' > /dev/null 2>&1; then
-            echo "LocalStack is ready! (S3 service is available)"
+        # Check if S3 and SQS are available
+        if echo "$health_output" | jq -e '.services.s3 == "available" and .services.sqs == "available"' > /dev/null 2>&1; then
+            echo "LocalStack is ready! (S3 and SQS services are available)"
             return 0
         fi
         

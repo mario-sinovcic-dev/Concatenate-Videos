@@ -24,6 +24,13 @@ module "storage" {
   environment = local.environment
 }
 
+# SQS queue for job processing
+module "queue" {
+  source = "../../modules/queue"
+
+  environment = local.environment
+}
+
 
 # TODO: Add queue module for SQS
 # TODO: Add compute module for ECS/Fargate

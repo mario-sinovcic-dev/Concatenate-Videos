@@ -4,6 +4,7 @@
 # TODO - Networking - depends on existig infra
 #        Use existing VPC and subnets if already created (import via data.tf)
 
+# TODO - move all this to database module
 # Generate random password for RDS
 resource "random_password" "db_password" {
   length  = 16
@@ -43,9 +44,16 @@ module "database" {
   tags = local.tags
 }
 
-# S3 bucket for video storage
+# S3 bucket for video storage# S3 bucket for video storage
 module "storage" {
   source = "../../modules/storage"
+
+  environment = local.environment
+}
+
+# SQS queue for job processing
+module "queue" {
+  source = "../../modules/queue"
 
   environment = local.environment
 }

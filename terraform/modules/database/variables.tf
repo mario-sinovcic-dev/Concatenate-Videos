@@ -1,3 +1,5 @@
+# TODO: add validation where possible
+
 variable "identifier" {
   description = "Identifier for the RDS instance"
   type        = string
@@ -55,6 +57,11 @@ variable "allowed_security_groups" {
 variable "environment" {
   description = "Environment name (e.g., local, dev)"
   type        = string
+
+  validation {
+    condition     = contains(["local", "dev", "staging", "prod"], var.environment)
+    error_message = "Valid values for var: test_variable are (\"local\", \"dev\", \"staging\", \"prod\")."
+  } 
 }
 
 variable "tags" {
